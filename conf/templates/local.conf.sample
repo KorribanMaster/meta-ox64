@@ -35,7 +35,7 @@
 #MACHINE ?= "edgerouter"
 #
 # This sets the default machine to be qemux86-64 if no other machine is selected:
-MACHINE ??= "bl808"
+MACHINE ?= "ox64"
 
 #
 # Where to place downloads
@@ -86,7 +86,7 @@ MACHINE ??= "bl808"
 # Ultimately when creating custom policy, people will likely end up subclassing
 # these defaults.
 #
-DISTRO ?= "OpenBouffalo"
+DISTRO ?= "Ox64"
 # As an example of a subclass there is a "bleeding" edge policy configuration
 # where many versions are set to the absolute latest code from the upstream
 # source control systems. This is just mentioned here as an example, its not
@@ -275,3 +275,8 @@ PACKAGECONFIG:append:pn-qemu-system-native = " sdl"
 # track the version of this file when it was generated. This can safely be ignored if
 # this doesn't mean anything to you.
 CONF_VERSION = "2"
+
+RM_OLD_IMAGE = "1"
+GLIBC_GENERATE_LOCALES = "en_US.UTF-8"
+IMAGE_LINGUAS ?= "en-us"
+BUILD_CONFIG_VARS += "DL_DIR SSTATE_DIR SSTATE_MIRRORS"

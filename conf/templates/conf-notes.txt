@@ -1,6 +1,6 @@
-Default distro: OpenBouffalo
-Default machine: bl808
+Default distro: Ox64
+Default machine: ox64
 
 Run
 
-   bitbake openbouffalo-image-dev
+   bitbake ox64-image-dev

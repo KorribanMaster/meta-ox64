@@ -1,0 +1,58 @@
+name: Build Yocto Images
+on:
+  push:
+    branches: [ "kirkstone" ]
+  pull_request:
+    branches: [ "kirkstone" ]
+
+jobs:
+  build-yocto:
+    strategy:
+      fail-fast: true
+      matrix:
+        image: [
+          ox64-image,
+          ox64-image-dev,
+        ]
+        machine: [
+          ox64
+        ]
+    name: Build Yocto Images
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/korribanmaster/meta-ox64:kirkstone
+      env:
+        LC_ALL: en_US.UTF-8
+        LANG: en_US.UTF-8
+        LANGUAGE: en_US.UTF-8
+      volumes:
+        - cache:/cache
+
+    steps:
+      - name: Setup repo
+        run: |
+          repo init -u https://github.com/KorribanMaster/ox64-manifests -m manifests/experimental/ox64.xml -b main
+          repo sync
+      - name: Checkout working branch
+        run: |
+          cd sources/meta-ox64
+          git checkout $${{ github.ref_name }}
+          cd -
+      - name: Setup Cache and Download
+        run: |
+          echo 'SSTATE_DIR = "/cache/sstate-cache"' > site.conf
+          echo 'DL_DIR = "/cache/dl"' >> site.conf
+          echo 'BUILD_NUMBER = "${{ github.run_number }}"' >> site.conf
+
+      - name: Build Yocto image
+        run: |
+          chmod -R a+rwx .
+          su yoctouser -c 'echo "I am $(whoami)"; pwd; ls -lah; source ox64-init-build-env; MACHINE=${{ matrix.machine }} bitbake ${{ matrix.image }}'
+        shell: bash
+      - name: Archive Images
+        uses: actions/upload-artifact@v3
+        with:
+          name: image_${{ matrix.machine}}_${{matrix.image}}
+          path: |
+            build/tmp/deploy/images/${{matrix.machine}}/*
+          retention-days: 21
